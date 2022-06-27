@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=devide-width, initial-scale=1."> <!--  to make it mobile friendly -->
+    <title>Inventory Homepage</title>
+    
+    <!-- ICONS -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- STYLESHEET -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript">
+      import {Html5QrcodeScanner} from "html5-qrcode"
+      import {Html5Qrcode} from "html5-qrcode"
+      </script>
+    <link rel="stylesheet" href="./inv_dash.css">
+    
+  </head>
+<body>
+  <div class="container">
+    <!--============ SIDEBAR (LEFT) ============-->
+    <aside>
+      <div class="topbar">
+        <div class="logo">
+          <h1>Shopping Cart</h1>
+        <h3> Hello, this is what your cart looks like right now.</h3>
+        </div>
+        <div class="close" id="close-btn">
+          <span class="material-icons">close</span>
+        </div>
+      </div>
+
+      <div class="sidebar">
+        
+          <button id="end"  class="btn solid" type="submit">End Shopping</button>
+        
+          <h1>Total Cost</h1>
+         <p style="font-size: 50px;">₹<span style="font-size: 50px;" id="tl_cost"></span></p>
+        
+        <div id="reader" width="600px"></div>
+      </div>
+    </aside>
+
+    <!--============ MIDDLE (MAIN) SECTION ============-->
+    <main>
+      <div class="inventory-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Product Name</th>
+              <th>Price</th>
+              <th>Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- will be filled automatically with js function (see inv_dash.js) -->
+          </tbody>
+        </table>
+      </div>
+    </main>
+    
+    <!--============ RIGHT SECTION ============-->
+    <div class="right">
+      <div class="right-top">
+        <button id="toggle-sidebar">
+          <span class="material-icons">menu</span>
+        </button>
+        <div class="profile">
+          
+          <div class="profile-pic">
+            <img src="./assets/sample_profile.jpg">
+          </div>
+        </div>
+      </div>
+
+      <h2>Notes</h2>
+      <textarea id="notes"
+       placeholder="Click here and begin typing to write down notes.."
+       spellcheck="false">
+     </textarea>
+     
+
+    </div>
+    <!--============ END OF RIGHT SECTION ============-->
+  </div>
+
+  <script src="inv_dash.js"></script>
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.4.0/firebase-app.js";
+    import { getDatabase, get, child, ref, query, equalTo } from "https://www.gstatic.com/firebasejs/9.4.0/firebase-database.js";
+    const firebaseConfig = {
+    apiKey: "AIzaSyAYy4pbiuDP9SVoGg6c8brKoaRaSAYwI68",
+    authDomain: "ec-scart.firebaseapp.com",
+    databaseURL: "https://ec-scart-default-rtdb.firebaseio.com",
+    projectId: "ec-scart",
+    storageBucket: "ec-scart.appspot.com",
+    messagingSenderId: "896158636454",
+    appId: "1:896158636454:web:a23a2dd3f955eaf663d767"
+  };
+
+  const app = initializeApp(firebaseConfig);
+    const db=getDatabase();
+    const dbRef = ref(db);
+    var nme;
+    var cst;
+    let brcode=0;
+    let qty=0;
+    const html5QrCode = new Html5Qrcode("reader");
+const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+  window.alert(`Code matched = ${decodedText}`, decodedResult);
+    brcode=decodedText;
+    console.log(decodedText);
+    qty = parseInt(prompt("Enter the Quantity"));
+    console.log(qty);
+    get(child(dbRef, "Products/"+brcode)).then((snapshot) => {
+      if (snapshot.exists()) {
+        console.log(snapshot.val());
+        nme=snapshot.val().brand;
+        cst=snapshot.val().cost;
+        console.log(nme);
+        console.log(cst);
+        const item={
+          name: nme,
+          price: cst,
+          quantity: qty
+        };
+        console.log(item);
+        
+        sessionStorage.setItem(brcode, JSON.stringify(item));
+        var n=JSON.parse(sessionStorage.getItem(brcode)).quantity;
+        console.log(n);
+      } 
+      else {
+        console.log("No data available");
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
+};
+const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+html5QrCode.start({ facingMode: { exact: "environment"} }, config, qrCodeSuccessCallback);
+
+html5QrCode.stop().then((ignore) => {
+  // QR Code scanning is stopped.
+}).catch((err) => {
+  console.error(error);
+});
+    // Initialize Firebase
+    
+    
+    </script>
+    <script>
+      end.addEventListener('click',(e)=>{
+        sessionStorage.clear();
+        location.replace("dashboard3.html");
+      })
+    </script>
+</body>
+</html>
+</body>
+</html>
